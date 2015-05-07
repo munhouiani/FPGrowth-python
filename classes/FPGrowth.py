@@ -274,11 +274,7 @@ class FPGrowth:
                 power_set = list(build_power_set(frequent_pattern.split()))
                 for subset in power_set:
                     # build subset string
-                    subset_string = ""
-                    for subsetCharacter in subset:
-                        subset_string += subsetCharacter + " "
-                    # remove last character
-                    subset_string = subset_string[:-1]
+                    subset_string = " ".join(subset)
                     if subset_string in self.frequent_patterns.keys():
                         conf = self.frequent_patterns[frequent_pattern] / self.frequent_patterns[subset_string]
                         if conf >= self.minconf:
