@@ -182,7 +182,7 @@ class FPGrowth:
                 if conditional_pattern is not None:
                     conditional_pattern_base[conditional_pattern] = item_in_tree.count
 
-            frequent_patterns[current_pattern] = support_of_current_pattern
+            frequent_patterns[tuple(current_pattern.split())] = support_of_current_pattern
 
             # counting frequencies of single items in conditional pattern-base
             conditional_items_map_to_frequency = dict()
@@ -265,22 +265,19 @@ class FPGrowth:
 
     def print_fp(self):
         for item in self.frequent_patterns:
-            print("{", item, "}", "(", self.frequent_patterns[item], ")")
+            print("{ %s } ( %d )" % (" ".join(item), self.frequent_patterns[item]))
 
     def generating_rules(self):
         # proceed if frequent pattern's size is larger than 1
         for frequent_pattern in self.frequent_patterns:
-            if len(frequent_pattern.split()) >= 2:
-                power_set = list(build_power_set(frequent_pattern.split()))
+            if len(frequent_pattern) >= 2:
+                power_set = list(build_power_set(frequent_pattern))
                 for subset in power_set:
-                    # build subset string
-                    subset_string = " ".join(subset)
-                    if subset_string in self.frequent_patterns.keys():
-                        conf = self.frequent_patterns[frequent_pattern] / self.frequent_patterns[subset_string]
+                    if subset in self.frequent_patterns.keys():
+                        conf = self.frequent_patterns[frequent_pattern] / self.frequent_patterns[subset]
                         if conf >= self.minconf:
-                            subset_list = list(subset_string.split())
-                            frequent_pattern_list = list(frequent_pattern.split())
-                            frequent_minus_subset_list = [item for item in frequent_pattern_list if
-                                                          item not in subset_list]
-                            print("{", subset_string, "}", "=>", "{", " ".join(frequent_minus_subset_list), "}", "(",
-                                  conf, ")")
+                            frequent_minus_subset = ""
+                            for item in frequent_pattern:
+                                if item not in subset:
+                                    frequent_minus_subset += item + " "
+                            print("{ %s } => { %s} ( %.2f )" % (" ".join(subset), frequent_minus_subset, conf))
